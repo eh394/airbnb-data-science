@@ -64,6 +64,3 @@ def load_airbnb(df, subset, label):
     labels = df[label]
     return (features, labels)
 
-df = pd.read_csv('clean_tabular_data.csv')
-features, labels = load_airbnb(df, (rating_columns + default_value_columns), 'Price_Night') 
-print(features.head(), labels.head())
