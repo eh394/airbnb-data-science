@@ -1,13 +1,16 @@
 import pandas as pd
 import numpy as np
 from tabular_data import load_airbnb, rating_columns, default_value_columns
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.metrics import mean_squared_error
 import math
 import csv
 import itertools
-from utils import hyperparams_dict
+from utils import hyperparams
+import joblib
+import os
+import json
 
 np.random.seed(2)
 
@@ -85,9 +88,9 @@ def custom_tune_reg_model_hyperparams(
 
     return acc_metrics
 
-data = X_train, y_train, X_validation, y_validation, X_test, y_test
-hyperparams_metrics_lst = custom_tune_reg_model_hyperparams(
-    SGDRegressor, data, hyperparams_dict)
+# data = X_train, y_train, X_validation, y_validation, X_test, y_test
+# hyperparams_metrics_lst = custom_tune_reg_model_hyperparams(
+#     SGDRegressor, data, hyperparams)
 
 
 # def choose_optimal_hyperparams(metrics):
@@ -103,16 +106,84 @@ def choose_optimal_hyperparams(metrics):
     return sorted(metrics, key=lambda m: m['RMSE'])[0]
 
 
-optimal_model_hyperparams = choose_optimal_hyperparams(
-    hyperparams_metrics_lst)
-print(optimal_model_hyperparams)
+# optimal_model_hyperparams = choose_optimal_hyperparams(
+#     hyperparams_metrics_lst)
+# print(optimal_model_hyperparams)
 
 
-def tune_reg_model_hyperparams():
-    pass
+def tune_reg_model_hyperparams(
+        model,
+        data,
+        hyperparams
+):
+    X_train, y_train, X_validation, y_validation, X_test, y_test = data
+    reg_model = model()
+    grid_reg = GridSearchCV(estimator=reg_model, param_grid=hyperparams, cv=2)
+    grid_reg.fit(X_train, y_train)
+   
+    print(" Results from Grid Search " )
+    print("\n The best estimator across ALL searched params:\n",grid_reg.best_estimator_)
+    print("\n The best score across ALL searched params:\n",grid_reg.best_score_)
+    print("\n The best parameters across ALL searched params:\n",grid_reg.best_params_)
+
+    return grid_reg
+
+
+best_reg=SGDRegressor(
+    loss='squared_epsilon_insensitive',
+    penalty='l2',
+    learning_rate='invscaling',
+    alpha=0.01,
+    max_iter=1000,
+    early_stopping=True)
+
+best_reg.fit(X_train, y_train)
+
+optimal_model_hyperparams = {
+    'loss': 'squared_epsilon_insensitive',
+    'penalty': 'l2',
+    'learning_rate': 'invscaling',
+    'alpha': 0.01,
+    'max_iter': 1000,
+    'early_stopping': True
+}
+
+optimal_metrics = {
+     'R_sq': best_reg.score(X_validation, y_validation),
+     'RMSE': math.sqrt(mean_squared_error(
+            y_validation, best_reg.predict(X_validation)))
+}
+
+
+# def save_model(folder, trained_model, filename):
+#     dirname = os.path.dirname(filename)
+#     filename = os.path.join(dirname, folder)
+#     joblib.dump(trained_model, filename)
+    
+
+# save_model('./models/regression/linear_regression', best_reg, 'regression_model.joblib')
+
+def save_model(trained_model, opt_hyperparams, metrics, folder):
+    filepath = folder + 'regression_model.joblib'
+    joblib.dump(trained_model, filepath)
+
+    filepath = folder + 'hyperparameters.json'
+    json.dump(opt_hyperparams, open(filepath, 'w'))
+
+    filepath = folder + 'metrics.json'
+    json.dump(metrics, open(filepath, 'w'))
+    
+
+save_model(best_reg, optimal_model_hyperparams, optimal_metrics, 'models/regression/linear_regression/')
 
 
 # with open('initial_results.csv', 'w') as output_file:
 #     dict_writer = csv.DictWriter(output_file, param_lst[0].keys())
 #     dict_writer.writeheader()
 #     dict_writer.writerows(param_lst)
+
+SGDRegressor
+LinearRegression
+DecisionTreeRegressor
+RandomForestRegressor
+GradientBoostingRegressor

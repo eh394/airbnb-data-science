@@ -1,7 +1,7 @@
 
 
 
-hyperparams_dict = {
+hyperparams = {
     'loss': ['squared_error', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'],
     'penalty': ['l2', 'l1', 'elasticnet', None],
     'learning_rate': ['constant', 'optimal', 'invscaling', 'adaptive'],
