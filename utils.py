@@ -1,11 +1,62 @@
 
 
-
-hyperparams = {
+SGDRegressor_params = {
     'loss': ['squared_error', 'huber', 'epsilon_insensitive', 'squared_epsilon_insensitive'],
     'penalty': ['l2', 'l1', 'elasticnet', None],
     'learning_rate': ['constant', 'optimal', 'invscaling', 'adaptive'],
     'alpha': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1],
     'max_iter': [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000],
     'early_stopping': [True, False]
+}
+
+
+LinearRegression_params = {
+    'fit_intercept': [True],
+    'copy_X': [True],
+    'n_jobs': [None],
+    'positive': [False]
+}
+
+
+DecisionTreeRegressor_params = {
+    'criterion': ['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
+    'splitter': ['best', 'random'],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
+    'min_samples_split': [2, 0.05, 0.10, 0.15, 0.20],
+    'min_samples_leaf': [1, 0.05, 0.10, 0.15, 0.20],
+    'max_features': [None, 'sqrt', 'log2'],
+    'ccp_alpha': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
+}
+
+
+RandomForestRegressor_params = {
+    'n_estimators': [5, 10, 50, 100],
+    'criterion': ['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
+    'min_samples_split': [2, 0.05, 0.10, 0.15, 0.20],
+    'min_samples_leaf': [1, 0.05, 0.10, 0.15, 0.20],
+    'max_features': [0.25, 0.5, 1.0, 'sqrt', 'log2'],
+    'bootstrap': [True, False],
+    'ccp_alpha': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
+}
+
+
+GradientBoostingRegressor_params = {
+    'loss': ['squared_error', 'absolute_error', 'huber', 'quantile'],
+    'learning_rate': [0.05, 0.1, 1],
+    'n_estimators': [50, 100, 500],
+    'criterion': ['squared_error', 'friedman_mse'],
+    'min_samples_split': [2, 0.10, 0.20],
+    'min_samples_leaf': [1, 0.10, 0.20],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
+    'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None]
+}
+
+
+LogisticRegression_params = {
+    'penalty': ['l2', None],
+    'class_weight': ['balanced', None],
+    'solver': ['saga'],
+    'max_iter': [3000],
+    'multi_class': ['multinomial']
 }
