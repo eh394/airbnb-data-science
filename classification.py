@@ -5,6 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 import math
 import itertools
+import joblib
+import json
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+
 
 from sklearn.linear_model import LogisticRegression
 import utils
@@ -103,8 +108,56 @@ def choose_optimal_hyperparams(metrics):
     return sorted(metrics, reverse=True, key=lambda m: m['accuracy'])[0]
 
 
+
+def save_model(trained_model, opt_hyperparams, metrics, folder):
+    filepath = folder + 'regression_model.joblib'
+    joblib.dump(trained_model, filepath)
+
+    filepath = folder + 'hyperparameters.json'
+    json.dump(opt_hyperparams, open(filepath, 'w'))
+
+    filepath = folder + 'metrics.json'
+    json.dump(metrics, open(filepath, 'w'))
+
+
+models = {
+    LogisticRegression: utils.LogisticRegression_params,
+    DecisionTreeClassifier: utils.DecisionTreeClassifier_params,
+    RandomForestClassifier: utils.RandomForestClassifier_params,
+    GradientBoostingClassifier: utils.GradientBoostingClassifier_params
+}
+
+
+# CONSIDER HOW TO HANDLE INCOMPATIBLE HYPERPARAMETERS
+
+def evaluate_all_models(models, data):
+
+    X_train, y_train, X_validation, y_validation, X_test, y_test = data
+
+    for model, params in models.items():
+        optimal_params = choose_optimal_hyperparams(
+            custom_tune_reg_model_hyperparams(model, data, params)
+        )
+        optimal_params.pop('accuracy')
+        optimal_params.pop('precision')
+        optimal_params.pop('recall')
+        optimal_params.pop('f1')
+        model = model(**optimal_params)
+        model.fit(X_train, y_train)
+        metrics = {
+            'accuracy': accuracy_score(y_validation, model.predict(X_validation)),
+            'precision': precision_score(y_validation, model.predict(X_validation), average='weighted')
+        }
+        model_name = f"{model}".split("(")[0]
+        save_model(model, optimal_params, metrics,
+                   f"models/classification/{model_name}/")
+
+
+evaluate_all_models(models, data)
+
+
 # foo = custom_tune_reg_model_hyperparams(data, utils.LogisticRegression_params)
-foo = choose_optimal_hyperparams(custom_tune_reg_model_hyperparams(LogisticRegression, data, utils.LogisticRegression_params))
-print(foo)
+# foo = choose_optimal_hyperparams(custom_tune_reg_model_hyperparams(LogisticRegression, data, utils.LogisticRegression_params))
+# print(foo)
 
 

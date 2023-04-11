@@ -54,9 +54,26 @@ GradientBoostingRegressor_params = {
 
 
 LogisticRegression_params = {
-    'penalty': ['l2', None],
+    'penalty': ['l1', 'l2', None],
     'class_weight': ['balanced', None],
     'solver': ['saga'],
-    'max_iter': [3000],
-    'multi_class': ['multinomial']
+    'max_iter': [3000, 4000, 5000, 10000],
+    'multi_class': ['ovr', 'multinomial']
 }
+
+DecisionTreeClassifier_params = {
+    'criterion': ['gini'],
+    'splitter': ['best']
+}
+
+RandomForestClassifier_params = {
+    'criterion': ['gini'],
+    'class_weight': ['balanced']
+}
+
+
+GradientBoostingClassifier_params = {
+    'loss': ['log_loss'],
+    'learning_rate': [0.1]
+}
+
