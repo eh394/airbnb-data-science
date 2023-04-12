@@ -62,18 +62,37 @@ LogisticRegression_params = {
 }
 
 DecisionTreeClassifier_params = {
-    'criterion': ['gini'],
-    'splitter': ['best']
+    'criterion': ['gini', 'entropy', 'log_loss'],
+    'splitter': ['best', 'random'],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
+    'min_samples_split': [2, 0.10, 0.20],
+    'min_samples_leaf': [1, 0.10, 0.20],
+    'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
+    'ccp_alpha': [0.0, 0.01, 0.1] # appears to be costly parameter
 }
 
 RandomForestClassifier_params = {
-    'criterion': ['gini'],
-    'class_weight': ['balanced']
+    'criterion': ['gini', 'entropy', 'log_loss'],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6], # with this undefined, but criterion full set and class_weight as balanced, the result is better
+    'min_samples_split': [2, 0.10, 0.20],
+    'min_samples_leaf': [1, 0.10, 0.20], 
+    'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
+    'class_weight': [None, 'balanced'],
+    'ccp_alpha': [0.0, 0.01, 0.1]
 }
 
 
 GradientBoostingClassifier_params = {
     'loss': ['log_loss'],
-    'learning_rate': [0.1]
+    'learning_rate': [0.1, 1, 100, 10000],
+    'n_estimators': [1, 100, 1000, 10000],
+    'criterion': ['friedman_mse', 'squared_error'],
+    'min_samples_split': [2, 0.10, 0.20],
+    'min_samples_leaf': [1, 0.10, 0.20],
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
+    'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
+    'ccp_alpha': [0.0, 0.01, 0.1]
 }
+
+# 
 

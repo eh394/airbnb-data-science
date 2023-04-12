@@ -162,26 +162,26 @@ def find_best_model(models, folder):
         filepath = folder + model_name + '/metrics.json'
         with open(filepath) as json_file:
             metrics = json.load(json_file)
-            print(metrics)
+            print(model_name, metrics)
             if metrics['RMSE'] < opt_RMSE:
                 opt_RMSE = metrics['RMSE']
                 opt_model_name = model_name
 
     opt_model_filepath = folder + opt_model_name
 
-    model = joblib.load(opt_model_filepath + '/regression_model.joblib')
+    opt_model = joblib.load(opt_model_filepath + '/regression_model.joblib')
 
     with open(opt_model_filepath + '/hyperparameters.json') as json_file:
-        hyperparameters = json.load(json_file)
+        opt_hyperparameters = json.load(json_file)
 
     with open(opt_model_filepath + '/metrics.json') as json_file:
-        metrics = json.load(json_file)
+        opt_metrics = json.load(json_file)
 
-    return model_name, model, hyperparameters, metrics
+    return opt_model_name, opt_model, opt_hyperparameters, opt_metrics
 
 
-best_model_name, best_model, best_params, best_metrics = find_best_model(models, f"models/regression/")
-print(best_model_name, best_params, best_metrics)
+opt_model_name, opt_model, opt_params, opt_metrics = find_best_model(models, f"models/regression/")
+print(opt_model_name, opt_params, opt_metrics)
 
 
 # if __name__ == "__main__":

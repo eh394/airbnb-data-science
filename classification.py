@@ -29,7 +29,7 @@ X_validation, X_test, y_validation, y_test = train_test_split(
 
 data = X_train, y_train, X_validation, y_validation, X_test, y_test
 
-# epochs = 10000
+epochs = 10000
 # model = LogisticRegression(max_iter=2000)
 # model.fit(X_train, y_train)
 # print(model.coef_)
@@ -105,12 +105,12 @@ def custom_tune_reg_model_hyperparams(
 
 
 def choose_optimal_hyperparams(metrics):
-    return sorted(metrics, reverse=True, key=lambda m: m['accuracy'])[0]
+    return sorted(metrics, key=lambda m: m['accuracy'], reverse=True)[0]
 
 
 
 def save_model(trained_model, opt_hyperparams, metrics, folder):
-    filepath = folder + 'regression_model.joblib'
+    filepath = folder + 'classification_model.joblib'
     joblib.dump(trained_model, filepath)
 
     filepath = folder + 'hyperparameters.json'
@@ -126,6 +126,7 @@ models = {
     RandomForestClassifier: utils.RandomForestClassifier_params,
     GradientBoostingClassifier: utils.GradientBoostingClassifier_params
 }
+
 
 
 # CONSIDER HOW TO HANDLE INCOMPATIBLE HYPERPARAMETERS
@@ -153,7 +154,36 @@ def evaluate_all_models(models, data):
                    f"models/classification/{model_name}/")
 
 
-evaluate_all_models(models, data)
+# evaluate_all_models(models, data)
+
+
+def find_best_model(models, folder):
+    opt_accuracy = 0
+    for model in models.keys():
+        model_name = f"{model}".split(".")[-1].strip("'>")
+        filepath = folder + model_name + '/metrics.json'
+        with open(filepath) as json_file:
+            metrics = json.load(json_file)
+            print(model_name, metrics)
+            if metrics['accuracy'] > opt_accuracy:
+                opt_accuracy = metrics['accuracy']
+                opt_model_name = model_name
+
+    opt_model_filepath = folder + opt_model_name
+
+    opt_model = joblib.load(opt_model_filepath + '/classification_model.joblib')
+
+    with open(opt_model_filepath + '/hyperparameters.json') as json_file:
+        opt_hyperparameters = json.load(json_file)
+
+    with open(opt_model_filepath + '/metrics.json') as json_file:
+        opt_metrics = json.load(json_file)
+
+    return opt_model_name, opt_model, opt_hyperparameters, opt_metrics
+
+
+opt_model_name, opt_model, opt_params, opt_metrics = find_best_model(models, f"models/classification/")
+print(opt_model_name, opt_params, opt_metrics)
 
 
 # foo = custom_tune_reg_model_hyperparams(data, utils.LogisticRegression_params)

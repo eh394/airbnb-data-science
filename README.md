@@ -13,4 +13,13 @@ Milestone 4 involved:
 4. The hyperparameter-tuned model and their corresponding hyperparameters and metrics are saved in a local folder.
 5. The best model is then loaded into the file alongside its hyperparameters and metrics.
 
+# Milestone 5
+Milesstone 5 involved:
+
+1. Similarly to Milestone 4, implementing a custom function that tunes hyperparameters of various classification models.
+2. As above.
+3. As above for `LogisticRegression`, `DecisionTreeClassifier`, `RandomForestClassifier`, and `GradientBoostingClassifier`.
+4. As above.
+5. As above.
+
 
