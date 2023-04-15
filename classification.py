@@ -127,7 +127,8 @@ models = {
     GradientBoostingClassifier: utils.GradientBoostingClassifier_params
 }
 
-
+# Incorporate regularization, i.e. you want to ensure that the metrics of the training set and the validation set are of similar value to prevent overfitting
+# Also incorporate last step - reporting to provide metrics on the test set
 
 # CONSIDER HOW TO HANDLE INCOMPATIBLE HYPERPARAMETERS
 
