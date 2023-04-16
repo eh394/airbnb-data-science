@@ -68,14 +68,15 @@ DecisionTreeClassifier_params = {
     'min_samples_split': [2, 0.10, 0.20],
     'min_samples_leaf': [1, 0.10, 0.20],
     'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
-    'ccp_alpha': [0.0, 0.01, 0.1] # appears to be costly parameter
+    'ccp_alpha': [0.0, 0.01, 0.1]  # appears to be costly parameter
 }
 
 RandomForestClassifier_params = {
     'criterion': ['gini', 'entropy', 'log_loss'],
-    'max_depth': [None, 1, 2, 3, 4, 5, 6], # with this undefined, but criterion full set and class_weight as balanced, the result is better
+    # with this undefined, but criterion full set and class_weight as balanced, the result is better
+    'max_depth': [None, 1, 2, 3, 4, 5, 6],
     'min_samples_split': [2, 0.10, 0.20],
-    'min_samples_leaf': [1, 0.10, 0.20], 
+    'min_samples_leaf': [1, 0.10, 0.20],
     'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
     'class_weight': [None, 'balanced'],
     'ccp_alpha': [0.0, 0.01, 0.1]
@@ -93,6 +94,3 @@ GradientBoostingClassifier_params = {
     'max_features': [0.25, 0.5, 0.9, 'sqrt', 'log2', None],
     'ccp_alpha': [0.0, 0.01, 0.1]
 }
-
-# 
-

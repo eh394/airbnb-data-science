@@ -138,7 +138,7 @@ def evaluate_all_models(models, data):
 
     for model, params in models.items():
         optimal_params = choose_optimal_hyperparams(
-            custom_tune_reg_model_hyperparams(model, data, params)
+            custom_tune_reg_model_hyperparams(model, dedata, params)
         )
         optimal_params.pop('accuracy')
         optimal_params.pop('precision')
