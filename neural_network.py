@@ -5,6 +5,10 @@ from torch.utils.data import Dataset, DataLoader, random_split
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
 import yaml
+import datetime
+import os
+import json
+
 
 
 from tabular_data import load_airbnb, rating_columns, default_value_columns
@@ -109,13 +113,18 @@ def train(model,  hyperparams, epochs=10):
 
 
 class NN(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, hyperparams):
         super().__init__()
-        self.layers = torch.nn.Sequential(
-            torch.nn.Linear(10, 16),
-            torch.nn.ReLU(),
-            torch.nn.Linear(16, 1)
-        )
+         
+        n = hyperparams["model_depth"] - 2
+
+        layers = [torch.nn.Linear(10, hyperparams["hidden_layer_width"]), torch.nn.ReLU()]
+        for i in range(n):
+            layers.append(torch.nn.Linear(hyperparams["hidden_layer_width"], hyperparams["hidden_layer_width"]))
+            layers.append(torch.nn.ReLU())
+        layers.append(torch.nn.Linear(hyperparams["hidden_layer_width"], 1))
+
+        self.layers = torch.nn.Sequential(*layers)
 
 
     def forward(self, X):
@@ -129,6 +138,39 @@ dataset = AirbnbNightlyPriceRegressionDataset()
 train_dataset, validation_dataset = random_split(dataset, [0.7, 0.3])
 validation_dataset, test_dataset = random_split(validation_dataset, [0.5, 0.5])
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-model = NN()
+model = NN(params)
 train(model, params)
 
+print(type(model))
+
+# torch.save(model.state_dict(), 'model.pt')
+# state_dict = torch.load('model.pt')
+# loaded_model = NN()
+# loaded_model.load_state_dict(state_dict)
+
+def save_model(trained_model, folder, opt_hyperparams=None, metrics=None):
+    
+    if str(type(trained_model)) == "<class '__main__.NN'>":
+        now = datetime.datetime.now()
+        folder = folder + f"{now}"
+        os.makedirs(folder)
+        filepath = folder + f"/model.pt"
+        torch.save(model.state_dict(), filepath)
+
+    else:
+        filepath = folder + 'classification_model.joblib'
+        joblib.dump(trained_model, filepath)
+
+    filepath = folder + '/hyperparameters.json'
+    json.dump(opt_hyperparams, open(filepath, 'w'))
+
+    filepath = folder + '/metrics.json'
+    json.dump(metrics, open(filepath, 'w'))
+
+
+# save_model(model, "models/neural_networks/regression/")
+
+model.eval()
+validation_dataset = 
+# X_validation, y_validation = validation_dataset
+print(validation_dataset)
