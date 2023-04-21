@@ -8,7 +8,7 @@ import yaml
 import datetime
 import os
 import json
-
+from sklearn.model_selection import train_test_split
 
 
 from tabular_data import load_airbnb, rating_columns, default_value_columns
@@ -16,18 +16,30 @@ from tabular_data import load_airbnb, rating_columns, default_value_columns
 np.random.seed(2)
 
 
-# df = pd.read_csv('clean_tabular_data.csv')
-# features, labels = load_airbnb(
-#     df, (rating_columns + default_value_columns), 'Price_Night')
+df = pd.read_csv('clean_tabular_data.csv')
+features, labels = load_airbnb(
+    df, (rating_columns + default_value_columns), 'Price_Night')
+
+X_train, X_test, y_train, y_test = train_test_split(
+    features, labels, train_size=0.7, test_size=0.3)
+X_validation, X_test, y_validation, y_test = train_test_split(
+    X_test, y_test, test_size=0.5)
+
+
+
+
 
 class AirbnbNightlyPriceRegressionDataset(Dataset):
     
-    def __init__(self):
+    def __init__(self, data):
         super().__init__()
-        data = pd.read_csv("clean_tabular_data.csv")
+        # data = pd.read_csv("clean_tabular_data.csv")
         # print(data)
-        self.X = data[rating_columns + default_value_columns].astype(np.float32)
-        self.Y = data["Price_Night"].astype(np.float32)
+        X_train, y_train = data
+        # self.X = data[rating_columns + default_value_columns].astype(np.float32)
+        # self.Y = data["Price_Night"].astype(np.float32)
+        self.X = X_train.astype(np.float32)
+        self.Y = y_train.astype(np.float32)
         
 
     def __getitem__(self, index):
@@ -39,6 +51,14 @@ class AirbnbNightlyPriceRegressionDataset(Dataset):
         return len(self.Y)
     
 
+
+train_data = X_train, y_train
+train_dataset = AirbnbNightlyPriceRegressionDataset(train_data)
+validation_data = X_validation, y_validation
+validation_dataset = AirbnbNightlyPriceRegressionDataset(validation_data)
+
+
+
 # dataset = AirbnbNightlyPriceRegressionDataset()
 # print(dataset[10])
 # print(len(dataset))
@@ -46,30 +66,6 @@ class AirbnbNightlyPriceRegressionDataset(Dataset):
 # train_dataset, validation_dataset = random_split(dataset, [0.7, 0.3])
 # validation_dataset, test_dataset = random_split(validation_dataset, [0.5, 0.5])
 
-
-
-# train_loader = DataLoader(dataset, batch_size=4, shuffle=True)
-# example = next(iter(train_loader))
-# print(example)
-# features, labels = example
-# print('hello')
-# print(features.dtype)
-# print(labels.dtype)
-
-
-# class LinearRegression(torch.nn.Module):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         # initialise parameters
-#         self.linear_layer = torch.nn.Linear(10, 1)
-#         pass
-
-#     def forward(self, features):
-#         # use layers to process features
-#         return self.linear_layer(features)
-
-# model = LinearRegression()
-# print(model(features))
 
 
 def get_nn_config(filename):
@@ -85,8 +81,6 @@ def train(model,  hyperparams, epochs=10):
     
     optimiser = getattr(torch.optim, hyperparams["optimiser"])
     optimiser = optimiser(model.parameters(), lr=hyperparams["learning_rate"])
-
-    # optimiser = torch.optim.SGD(model.parameters(), lr=0.001)
 
     writer = SummaryWriter()
 
@@ -104,12 +98,13 @@ def train(model,  hyperparams, epochs=10):
             writer.add_scalar('loss', loss.item(), batch_idx)
             batch_idx += 1
 
-        validation_loader = DataLoader(validation_dataset, batch_size=4, shuffle=True)
-        for batch in validation_loader:
-            features, labels = batch
-            prediction = model(features)
-            loss = F.mse_loss(prediction, labels)
-            print(loss)
+        # validation_loader = DataLoader(validation_dataset, batch_size=4, shuffle=True)
+        # for batch in validation_loader:
+        #     features, labels = batch
+        #     prediction = model(features)
+        #     loss = F.mse_loss(prediction, labels)
+        #     print(loss)
+    return model
 
 
 class NN(torch.nn.Module):
@@ -134,12 +129,22 @@ class NN(torch.nn.Module):
 
 
 
-dataset = AirbnbNightlyPriceRegressionDataset()
-train_dataset, validation_dataset = random_split(dataset, [0.7, 0.3])
-validation_dataset, test_dataset = random_split(validation_dataset, [0.5, 0.5])
+train_data = X_train, y_train
+train_dataset = AirbnbNightlyPriceRegressionDataset(train_data)
+print(type(train_dataset))
+# train_dataset, validation_dataset = random_split(dataset, [0.7, 0.3])
+# validation_dataset, test_dataset = random_split(validation_dataset, [0.5, 0.5])
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
 model = NN(params)
+train_start_time = datetime.datetime.now()
 train(model, params)
+train_end_time = datetime.datetime.now()
+training_duration = train_end_time - train_start_time
+print(training_duration)
+
+
+
+
 
 print(type(model))
 
@@ -170,7 +175,7 @@ def save_model(trained_model, folder, opt_hyperparams=None, metrics=None):
 
 # save_model(model, "models/neural_networks/regression/")
 
-model.eval()
-validation_dataset = 
+# model.eval()
+# validation_dataset = 
 # X_validation, y_validation = validation_dataset
-print(validation_dataset)
+# print(validation_dataset)
