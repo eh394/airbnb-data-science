@@ -17,6 +17,7 @@ import json
 
 np.random.seed(2)
 
+# as previously, move this into a generic file and reconfigure accordingly
 df = pd.read_csv('clean_tabular_data.csv')
 features, labels = load_airbnb(
     df, (rating_columns + default_value_columns), 'Price_Night')
@@ -33,7 +34,7 @@ data = X_train, y_train, X_validation, y_validation, X_test, y_test
 # print(your_model.coef_)
 # print(your_model.intercept_)
 # print(your_model.score(x_test, y_test))
-epochs = 10000
+epochs = 10000  # verifu how much difference varying number of epochs makes
 # your_model = SGDRegressor() # max_iter=1000
 # your_model.fit(X_train, y_train)
 # print(your_model.coef_)
@@ -48,6 +49,8 @@ epochs = 10000
 # print(f"RMSE for the trainining data: {RMSE_train}")
 # print(f"R^2 for the test data: {your_model.score(X_test, y_test)}")
 # print(f"RMSE for the test data: {RMSE_test}")
+
+# move into utils file and combine with classification if possible
 
 
 def custom_tune_reg_model_hyperparams(
@@ -76,6 +79,7 @@ def choose_optimal_hyperparams(metrics):
     return sorted(metrics, key=lambda m: m['RMSE'])[0]
 
 
+# might be worth utilising this more
 def tune_reg_model_hyperparams(
         model,
         data,
@@ -99,6 +103,8 @@ def tune_reg_model_hyperparams(
           grid_reg.best_params_)
 
     return grid_reg
+
+# to be moved to a generic utils file
 
 
 def save_model(trained_model, opt_hyperparams, metrics, folder):
@@ -180,9 +186,10 @@ def find_best_model(models, folder):
     return opt_model_name, opt_model, opt_hyperparameters, opt_metrics
 
 
-opt_model_name, opt_model, opt_params, opt_metrics = find_best_model(models, f"models/regression/")
+opt_model_name, opt_model, opt_params, opt_metrics = find_best_model(
+    models, f"models/regression/")
 print(opt_model_name, opt_params, opt_metrics)
 
-
+# fix this block
 # if __name__ == "__main__":
 #     print("hello")

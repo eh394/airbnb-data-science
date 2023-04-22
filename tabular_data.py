@@ -64,3 +64,5 @@ def load_airbnb(df, subset, label):
     labels = df[label]
     return (features, labels)
 
+# add if name main blocks into all files
+
