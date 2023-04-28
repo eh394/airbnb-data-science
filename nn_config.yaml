@@ -1,6 +1,0 @@
-optimiser: SGD
-lr: 0.0005
-hidden_layer_width: 37
-model_depth: 3
-
-

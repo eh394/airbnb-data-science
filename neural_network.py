@@ -3,6 +3,9 @@ import pandas as pd
 import yaml
 import json
 import datetime
+
+import time
+
 import os
 
 import torch
@@ -13,8 +16,8 @@ from torcheval.metrics.functional import r2_score
 from sklearn.model_selection import train_test_split
 import itertools
 
-import utils_nn
-from tabular_data import load_airbnb, rating_columns, default_value_columns
+import config
+from data_handling import load_airbnb, rating_columns, default_value_columns
 
 np.random.seed(2)
 
@@ -107,7 +110,8 @@ class NN(torch.nn.Module):
 # this can be a generic function moved to a utils file or similar
 def save_model(trained_model, folder, opt_hyperparams=None, metrics=None):
 
-    if str(type(trained_model)) == "<class '__main__.NN'>":
+    # if str(type(trained_model)) == "<class '__main__.NN'>":
+    if isinstance(trained_model, NN) == True:
         now = datetime.datetime.now()
         folder = folder + f"{now}"
         os.makedirs(folder)
@@ -193,7 +197,7 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=20, shuffle=True)
     validation_dataset = AirbnbNightlyPriceRegressionDataset(validation_data)
     validation_loader = DataLoader(validation_dataset)
-    find_best_nn(optimize_nn_params(generate_nn_configs(utils_nn.nn_params)))
+    find_best_nn(optimize_nn_params(generate_nn_configs(config.NN_params)))
 
 
 # state_dict = torch.load('models/neural_networks/regression/2023-04-22 19:40:12.264668/model.pt')

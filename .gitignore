@@ -11,5 +11,6 @@ Salaries.csv
 pytorch_test.py
 BostonHousing.csv
 runs
-.~lock.BostonHousing.csv#
+.~lock.BostonHousing.csv
+notes
 
