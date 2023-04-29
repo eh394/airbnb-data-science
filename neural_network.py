@@ -11,27 +11,24 @@ import os
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter # figure out how to use this
+from torch.utils.tensorboard import SummaryWriter  # figure out how to use this
 from torcheval.metrics.functional import r2_score
 from sklearn.model_selection import train_test_split
 import itertools
 
 import config
 from data_handling import load_airbnb, rating_columns, default_value_columns
+from data_handling import load_df, load_split_X_y, rating_columns, default_value_columns
+from utils import save_model
 
 np.random.seed(2)
 
 
-# Import data - to be moved to / dealt with in another file, possibly utils as can be used in all analysis files
-df = pd.read_csv('clean_tabular_data.csv')
-
-features, labels = load_airbnb(
-    df, (rating_columns + default_value_columns), 'Price_Night')
-
-X_train, X_test, y_train, y_test = train_test_split(
-    features, labels, train_size=0.7, test_size=0.3)
-X_validation, X_test, y_validation, y_test = train_test_split(
-    X_test, y_test, test_size=0.5)
+# Load Clean Data
+df = load_df('listing.csv', 'clean_tabular_data.csv',
+             rating_columns, 'Description', default_value_columns, 1)
+X_train, y_train, X_validation, y_validation, X_test, y_test = load_split_X_y(
+    df, (rating_columns + default_value_columns), 'Price_Night', 0.7, 0.5)
 
 train_data = X_train, y_train
 validation_data = X_validation, y_validation
@@ -53,14 +50,11 @@ class AirbnbNightlyPriceRegressionDataset(Dataset):
         return len(self.y)
 
 
-# Get configuration parameters - move to another file
+# Get configuration parameters - not currently used
 def get_nn_config(filename):
     with open(filename, "r") as params:
         params = yaml.safe_load(params)
         return params
-
-
-# params = get_nn_config("nn_config.yaml")
 
 
 # Function that trains the model
@@ -87,7 +81,7 @@ def train(model, data_loader, params, epochs=10):
 
     return model
 
-
+# Defines layers of neural network
 class NN(torch.nn.Module):
     def __init__(self, hyperparams):
         super().__init__()
@@ -108,25 +102,6 @@ class NN(torch.nn.Module):
         return self.model(X)
 
 # this can be a generic function moved to a utils file or similar
-def save_model(trained_model, folder, opt_hyperparams=None, metrics=None):
-
-    # if str(type(trained_model)) == "<class '__main__.NN'>":
-    if isinstance(trained_model, NN) == True:
-        now = datetime.datetime.now()
-        folder = folder + f"{now}"
-        os.makedirs(folder)
-        filepath = folder + f"/model.pt"
-        torch.save(trained_model.state_dict(), filepath)
-
-    else:
-        filepath = folder + 'classification_model.joblib'
-        joblib.dump(trained_model, filepath)
-
-    filepath = folder + '/hyperparameters.json'
-    json.dump(opt_hyperparams, open(filepath, 'w'))
-
-    filepath = folder + '/metrics.json'
-    json.dump(metrics, open(filepath, 'w'))
 
 
 def evaluate_model(model, X, y):

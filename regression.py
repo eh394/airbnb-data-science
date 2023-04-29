@@ -57,8 +57,8 @@ if __name__ == "__main__":
 
 
 
+# Add below to utils and verify against custom tune function
 
-#
 # def tune_reg_model_hyperparams(
 # model,
 # data,
