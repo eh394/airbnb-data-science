@@ -1,38 +1,20 @@
-import numpy as np
-import pandas as pd
-import yaml
-import json
 import datetime
-
-import time
-
-import os
-
-import torch
-from torch.utils.data import Dataset, DataLoader, random_split
-import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter  # figure out how to use this
-from torcheval.metrics.functional import r2_score
-from sklearn.model_selection import train_test_split
 import itertools
+import numpy as np
+import torch
+import yaml
+from torcheval.metrics.functional import r2_score
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from torch.utils.tensorboard import SummaryWriter
 
-import config
-# from data_handling import load_airbnb, rating_columns, default_value_columns
-from data_utils import load_df, load_split_X_y, rating_columns, default_value_columns
-from model_utils import save_model
+import model_config
+import data_config
+import data_utils
+import model_utils
+
 
 np.random.seed(2)
-
-
-# Load Clean Data, this could be moved to the if block at the bottom
-df = load_df('listing.csv', 'clean_tabular_data.csv',
-             rating_columns, 'Description', default_value_columns, 1)
-X_train, y_train, X_validation, y_validation, X_test, y_test = load_split_X_y(
-    df, (rating_columns + default_value_columns), 'Price_Night', 0.7, 0.5)
-
-train_data = X_train, y_train
-validation_data = X_validation, y_validation
-test_data = X_test, y_test
 
 
 class AirbnbNightlyPriceRegressionDataset(Dataset):
@@ -50,38 +32,35 @@ class AirbnbNightlyPriceRegressionDataset(Dataset):
         return len(self.y)
 
 
-# Get configuration parameters - not currently used
 def get_nn_config(filename):
     with open(filename, "r") as params:
         params = yaml.safe_load(params)
         return params
 
 
-# Function that trains the model
 def train(model, data_loader, params, epochs=10):
 
     optimiser = getattr(torch.optim, params["optimiser"])
     optimiser = optimiser(model.parameters(), lr=params["lr"])
     loss_fn = F.mse_loss
-    # writer = SummaryWriter()
+    writer = SummaryWriter()
     batch_idx = 0
 
     for epoch in range(epochs):
-        for batch in data_loader:  # fix this, makes sense to pass train loader here
+        for batch in data_loader:
             X, y = batch
             yhat = model(X)
             loss = loss_fn(yhat, y)
             loss.backward()
-            # print(loss.item())
             optimiser.step()
             optimiser.zero_grad()
-            # writer.add_scalar('loss', loss.item(), batch_idx)
+            writer.add_scalar('loss', loss.item(), batch_idx)
             batch_idx += 1
         # print(epoch, loss)
 
     return model
 
-# Defines layers of neural network
+
 class NN(torch.nn.Module):
     def __init__(self, hyperparams):
         super().__init__()
@@ -100,8 +79,6 @@ class NN(torch.nn.Module):
 
     def forward(self, X):
         return self.model(X)
-
-# this can be a generic function moved to a utils file or similar
 
 
 def evaluate_model(model, X, y):
@@ -152,7 +129,6 @@ def find_best_nn(summary):
     params_opt = {}
     metrics_opt = {}
     for entry in summary:
-        # print(entry[1]["RMSE_validation"])
         if entry[1]["RMSE_validation"] < RMSE_opt:
             RMSE_opt = entry[1]["RMSE_validation"]
             params_opt = entry[0]
@@ -160,21 +136,45 @@ def find_best_nn(summary):
 
     print(params_opt, metrics_opt)
     model = NN(params_opt)
-    save_model(model, "models/neural_networks/regression/",
-               opt_hyperparams=params_opt, metrics=metrics_opt)
+    model_utils.save_model(
+        model,
+        output_folder="models/neural_networks/regression/",
+        opt_hyperparams=params_opt,
+        metrics=metrics_opt
+    )
 
     return model, params_opt, metrics_opt
 
 
 if __name__ == "__main__":
 
+    df = data_utils.load_df(
+        raw_data_filename='listing.csv',
+        clean_data_filename='clean_tabular_data.csv',
+        missing_values_subset=rating_columns,
+        description_string_subset='Description'
+        default_values_subset=default_value_columns,
+        default_value=1
+    )
+
+    X_train, y_train, X_validation, y_validation, X_test, y_test = data_utils.load_split_X_y(
+        df,
+        features=data_config.feature_columns,
+        labels='Price_Night',
+        train_test_proportion=0.7,
+        test_validation_proportion=0.5
+    )
+
+    train_data = X_train, y_train
+    validation_data = X_validation, y_validation
+    test_data = X_test, y_test
+
     train_dataset = AirbnbNightlyPriceRegressionDataset(train_data)
     train_loader = DataLoader(train_dataset, batch_size=20, shuffle=True)
     validation_dataset = AirbnbNightlyPriceRegressionDataset(validation_data)
     validation_loader = DataLoader(validation_dataset)
-    find_best_nn(optimize_nn_params(generate_nn_configs(config.NN_params)))
+    find_best_nn(optimize_nn_params(
+        generate_nn_configs(model_config.NN_params)))
 
 
-# state_dict = torch.load('models/neural_networks/regression/2023-04-22 19:40:12.264668/model.pt')
-# loaded_model = NN()
-# loaded_model.load_state_dict(state_dict)
+
