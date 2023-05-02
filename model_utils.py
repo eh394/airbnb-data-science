@@ -7,6 +7,7 @@ import os
 import torch
 from sklearn.metrics import mean_squared_error, precision_score, recall_score, accuracy_score, f1_score
 
+import model_config
 
 def custom_tune_model_params(
         model,
@@ -57,12 +58,12 @@ def derive_metrics_classification(model, X_validation, y_validation):
 
 def choose_optimal_params(acc_metrics, config_metric):
 
-    assert (config_metric in regression_metrics) or (
-        config_metric in classification_metrics)
-    if config_metric in minimise_metrics:
+    assert (config_metric in model_config.regression_metrics) or (
+        config_metric in model_config.classification_metrics)
+    if config_metric in model_config.minimise_metrics:
         optim_params = sorted(
             acc_metrics, key=lambda m: m[config_metric], reverse=False)[0]
-    elif config_metric in maximise_metrics:
+    elif config_metric in model_config.maximise_metrics:
         optim_params = sorted(
             acc_metrics, key=lambda m: m[config_metric], reverse=True)[0]
     return optim_params
@@ -131,7 +132,7 @@ def evaluate_all_models(
             m, f"{output_folder}/{model_name}/", optim_params, optim_metrics)
 
 
-def find_optimal_model(models, output_folder, metric):
+def find_optimal_model(models, output_folder, config_metric):
 
     metrics_summary = []
     for model, config in models:
@@ -142,25 +143,25 @@ def find_optimal_model(models, output_folder, metric):
             metrics = json.load(json_file)
             metrics_summary.append((model_name, metrics))
 
-    opt_metric = metrics_summary[0][1][metric]
+    opt_metric = metrics_summary[0][1][config_metric]
     opt_model_name = metrics_summary[0][0]
 
     for model_name, metrics in metrics_summary:
 
-        if metric in maximise_metrics:
-            if metrics[metric] > opt_metric:
-                opt_metric = metrics[metric]
+        if config_metric in model_config.maximise_metrics:
+            if metrics[config_metric] > opt_metric:
+                opt_metric = metrics[config_metric]
                 opt_model_name = model_name
 
-        elif metric in minimise_metrics:
-            if metrics[metric] < opt_metric:
-                opt_metric = metrics[metric]
+        elif config_metric in model_config.minimise_metrics:
+            if metrics[config_metric] < opt_metric:
+                opt_metric = metrics[config_metric]
                 opt_model_name = model_name
 
     return opt_model_name, opt_metric
 
 
-def load_model(folder, model_name):
+def load_model(model_name, folder):
 
     model_filepath = f"{folder}/{model_name}"
 

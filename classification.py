@@ -13,16 +13,21 @@ np.random.seed(2)
 
 
 df = data_utils.load_df(
-    "listings.csv",
-    "listings_clean.csv",
-    data_config.rating_columns,
-    "Description",
-    data_config.default_value_columns,
-    1
+    raw_data_filename="listings.csv",
+    clean_data_filename="listings_clean.csv",
+    missing_values_subset=data_config.rating_columns,
+    description_string_subset="Description",
+    default_values_subset=data_config.default_value_columns,
+    default_value=1
 )
 
 X_train, y_train, X_validation, y_validation, X_test, y_test = data_utils.load_split_X_y(
-    df, data_config.feature_columns, "Category", 0.7, 0.5)
+    df,
+    features=data_config.feature_columns,
+    labels="Category",
+    train_test_proportion=0.7,
+    test_validation_proportion=0.5
+)
 
 
 epochs = 1000
@@ -46,14 +51,14 @@ if __name__ == "__main__":
         y_validation,
         model_config.classification_metrics,
         model_utils.derive_metrics_classification,
-        "models/classification",
-        "accuracy"
+        output_folder="models/classification",
+        config_metric="accuracy"
     )
 
     opt_model_name, opt_metric = model_utils.find_optimal_model(
         models,
-        "models/classification",
-        "accuracy"
+        output_folder="models/classification",
+        config_metric="accuracy"
     )
 
     opt_model, opt_params, opt_metrics = model_utils.load_model(
@@ -62,6 +67,3 @@ if __name__ == "__main__":
     )
 
     print(opt_model, opt_params, opt_metrics)
-
-
-
