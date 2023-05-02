@@ -17,14 +17,14 @@ from sklearn.model_selection import train_test_split
 import itertools
 
 import config
-from data_handling import load_airbnb, rating_columns, default_value_columns
-from data_handling import load_df, load_split_X_y, rating_columns, default_value_columns
-from utils import save_model
+# from data_handling import load_airbnb, rating_columns, default_value_columns
+from data_utils import load_df, load_split_X_y, rating_columns, default_value_columns
+from model_utils import save_model
 
 np.random.seed(2)
 
 
-# Load Clean Data
+# Load Clean Data, this could be moved to the if block at the bottom
 df = load_df('listing.csv', 'clean_tabular_data.csv',
              rating_columns, 'Description', default_value_columns, 1)
 X_train, y_train, X_validation, y_validation, X_test, y_test = load_split_X_y(

@@ -1,24 +1,8 @@
-from ast import literal_eval
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 pd.options.display.max_columns = None
 pd.options.display.max_rows = None
-
-
-rating_columns = [
-    'Cleanliness_rating',
-    'Accuracy_rating',
-    'Communication_rating',
-    'Location_rating',
-    'Check-in_rating',
-    'Value_rating']
-
-default_value_columns = [
-    'guests',
-    'beds',
-    'bathrooms',
-    'bedrooms']
 
 
 def remove_rows_with_missing_ratings(df, subset):
@@ -26,7 +10,7 @@ def remove_rows_with_missing_ratings(df, subset):
     return df
 
 
-def convert_string_list_to_string(input_string):
+def convert_string_list_to_string(input_string):  # add argument for offset
     try:
         output_list = pd.eval(input_string)
         output_string = " ".join(output_list[1:])
@@ -95,12 +79,3 @@ def load_split_X_y(
         X_test, y_test, test_size=test_validation_proportion)
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
-
-
-df = load_df('listing.csv', 'clean_tabular_data.csv',
-             rating_columns, 'Description', default_value_columns, 1)
-X_train, y_train, X_validation, y_validation, X_test, y_test = load_split_X_y(
-    df, (rating_columns + default_value_columns), 'Price_Night', 0.7, 0.5)
-
-
-# if __name__ == "__main__":
