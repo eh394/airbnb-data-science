@@ -7,7 +7,7 @@ import os
 import torch
 from sklearn.metrics import mean_squared_error, precision_score, recall_score, accuracy_score, f1_score
 
-import model_config
+from config import model_config
 
 
 def custom_tune_model_params(

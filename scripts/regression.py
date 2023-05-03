@@ -1,13 +1,10 @@
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.tree import DecisionTreeRegressor
 
-import data_config
-import data_utils
-import model_config
-import model_utils
-
+from config import data_config, model_config
+from lib import data_utils, model_utils
 
 np.random.seed(2)
 
@@ -16,10 +13,11 @@ epochs = 1000
 
 
 models = [
-    (LogisticRegression, model_config.LogisticRegression_params),
-    (DecisionTreeClassifier, model_config.DecisionTreeClassifier_params),
-    (RandomForestClassifier, model_config.RandomForestClassifier_params),
-    (GradientBoostingClassifier, model_config.GradientBoostingClassifier_params)
+    (SGDRegressor, model_config.SGDRegressor_params),
+    (LinearRegression, model_config.LinearRegression_params),
+    (DecisionTreeRegressor, model_config.DecisionTreeRegressor_params),
+    (RandomForestRegressor, model_config.RandomForestRegressor_params),
+    (GradientBoostingRegressor, model_config.GradientBoostingRegressor_params)
 ]
 
 
@@ -37,7 +35,7 @@ if __name__ == "__main__":
     X_train, y_train, X_validation, y_validation, X_test, y_test = data_utils.load_split_X_y(
         df,
         features=data_config.feature_columns,
-        labels="Category",
+        labels="Price_Night",
         train_test_proportion=0.7,
         test_validation_proportion=0.5
     )
@@ -48,21 +46,21 @@ if __name__ == "__main__":
         y_train,
         X_validation,
         y_validation,
-        model_config.classification_metrics,
-        model_utils.derive_metrics_classification,
-        output_folder="models/classification",
-        config_metric="accuracy"
+        model_config.regression_metrics,
+        model_utils.derive_metrics_regression,
+        output_folder="models/regression",
+        config_metric="RMSE"
     )
 
     opt_model_name, opt_metric = model_utils.find_optimal_model(
         models,
-        output_folder="models/classification",
-        config_metric="accuracy"
+        output_folder="models/regression",
+        config_metric="RMSE"
     )
 
     opt_model, opt_params, opt_metrics = model_utils.load_model(
         opt_model_name,
-        folder="models/classification"
+        folder="models/regression"
     )
 
     print(opt_model, opt_params, opt_metrics)
