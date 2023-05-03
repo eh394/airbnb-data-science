@@ -8,9 +8,9 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-import model_config
 import data_config
 import data_utils
+import model_config
 import model_utils
 
 
@@ -149,11 +149,11 @@ def find_best_nn(summary):
 if __name__ == "__main__":
 
     df = data_utils.load_df(
-        raw_data_filename='listing.csv',
-        clean_data_filename='clean_tabular_data.csv',
-        missing_values_subset=rating_columns,
-        description_string_subset='Description'
-        default_values_subset=default_value_columns,
+        raw_data_filename='listings.csv',
+        clean_data_filename='listings_clean.csv',
+        missing_values_subset=data_config.rating_columns,
+        description_string_subset='Description',
+        default_values_subset=data_config.default_value_columns,
         default_value=1
     )
 
@@ -173,8 +173,7 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=20, shuffle=True)
     validation_dataset = AirbnbNightlyPriceRegressionDataset(validation_data)
     validation_loader = DataLoader(validation_dataset)
-    find_best_nn(optimize_nn_params(
+    model, params_opt, metrics_opt = find_best_nn(optimize_nn_params(
         generate_nn_configs(model_config.NN_params)))
-
-
-
+    
+    print(params_opt, metrics_opt)

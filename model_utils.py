@@ -9,6 +9,7 @@ from sklearn.metrics import mean_squared_error, precision_score, recall_score, a
 
 import model_config
 
+
 def custom_tune_model_params(
         model,
         X_train,
@@ -28,8 +29,7 @@ def custom_tune_model_params(
 
         m = model(**acc)
         m.fit(X_train, y_train)
-
-        acc = acc.update(derive_metrics(m, X_validation, y_validation))
+        acc.update(derive_metrics(m, X_validation, y_validation))
         acc_metrics.append(acc)
 
     return acc_metrics
@@ -104,15 +104,18 @@ def evaluate_all_models(
 
     for model, params in models:
 
+        acc_metrics = custom_tune_model_params(
+            model,
+            X_train,
+            y_train,
+            X_validation,
+            y_validation,
+            params,
+            derive_metrics
+        )
+
         optim_params = choose_optimal_params(
-            custom_tune_model_params(  # consider assigning it to a variable as bumhead said
-                model,
-                X_train,
-                y_train,
-                X_validation,
-                y_validation,
-                params,
-                derive_metrics),
+            acc_metrics,
             config_metric
         )
 
@@ -124,7 +127,7 @@ def evaluate_all_models(
 
         optim_metrics = {}
         optim_metrics = derive_metrics(
-            m, X_validation, y_validation, optim_metrics)
+            m, X_validation, y_validation)
 
         model_name = f"{m}".split("(")[0]  # how to better approach this
 

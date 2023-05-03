@@ -61,8 +61,8 @@ if __name__ == "__main__":
     )
 
     opt_model, opt_params, opt_metrics = model_utils.load_model(
-        "models/classification",
-        opt_model_name
+        opt_model_name,
+        folder="models/classification"
     )
 
     print(opt_model, opt_params, opt_metrics)

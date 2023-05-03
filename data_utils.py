@@ -10,17 +10,18 @@ def remove_rows_with_missing_ratings(df, subset):
     return df
 
 
-def convert_string_list_to_string(input_string):  # add argument for offset
+def convert_string_list_to_string_and_offset(input_string, offset):
     try:
         output_list = pd.eval(input_string)
-        output_string = " ".join(output_list[1:])
+        output_string = " ".join(output_list[offset:])
         return output_string
     except:
         return np.nan
 
 
-def combine_description_strings(df, subset):
-    df[subset] = df[subset].apply(convert_string_list_to_string)
+def combine_description_strings(df, subset, offset):
+    df[subset] = df[subset].apply(
+        lambda x: convert_string_list_to_string_and_offset(x, offset))
     df.dropna(inplace=True, subset=subset)
     return df
 
@@ -38,7 +39,7 @@ def clean_tabular_data(
         default_value
 ):
     df = remove_rows_with_missing_ratings(df, missing_values_subset)
-    df = combine_description_strings(df, description_string_subset)
+    df = combine_description_strings(df, description_string_subset, offset=1)
     df = set_default_feature_values(df, default_values_subset, default_value)
     return df
 

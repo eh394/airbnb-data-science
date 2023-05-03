@@ -58,7 +58,7 @@ if __name__ == "__main__":
     opt_model_name, opt_metric = model_utils.find_optimal_model(
         models,
         output_folder="models/regression",
-        metric="RMSE"
+        config_metric="RMSE"
     )
 
     opt_model, opt_params, opt_metrics = model_utils.load_model(
