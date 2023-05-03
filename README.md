@@ -1,11 +1,10 @@
-# Milestone 3
-Please note that Milestones 1 and 2 involved setting up the environment and getting familiar with the overall scope of the project. Milestone 3 involved: 
+# Introduction
+This project utilises Airbnb listings data to identify optimum `regression` model and its hyperparameters to predict an Airbnb listing's price per night based on numeric data such as number of guests, various ratings, number of bedrooms etc. Mimimum `RMSE` is currently applied to identify the optimum model. Similarly, optimum `classification` model is identified to predict Category of a listing based on the highest `accuracy` score.
 
-1. Writing a series of simple functions in `tabular_data.py` file to load in the airbnb data from a csv file, carry out cleaning operations on the data and then save them to another csv.file. 
-2. Another function `load_airbnb` loads numeric columns of this dataset as pandas dataframe `features` and price per night column as `labels` in preparation for data analysis.
+`neural network` model is also utilised and tuned for optimum hyperparameters to (similarly to `regression`) predict price per night.
 
-# Milestone 4
-Milestone 4 involved:
+# Regression
+`Regression` modelling includes:
 
 1. Implementing a custom function that tunes hyperparameters of various regression models.
 2. Carrying out the same task using sklearn `GridSearchCV`.
@@ -13,13 +12,20 @@ Milestone 4 involved:
 4. The hyperparameter-tuned model and their corresponding hyperparameters and metrics are saved in a local folder.
 5. The best model is then loaded into the file alongside its hyperparameters and metrics.
 
-# Milestone 5
-Milesstone 5 involved:
+# Classification
+`Classification` modelling follows the same process as `Regression` except the models used namely: `LogisticRegression`, `DecisionTreeClassifier`, `RandomForestClassifier`, and `GradientBoostingClassifier`.
 
-1. Similarly to Milestone 4, implementing a custom function that tunes hyperparameters of various classification models.
-2. As above.
-3. As above for `LogisticRegression`, `DecisionTreeClassifier`, `RandomForestClassifier`, and `GradientBoostingClassifier`.
-4. As above.
-5. As above.
+# Code Organizaton
+The code is organized into three main folders, /config, /utils, and /scripts.
+
+## /config
+Includes information on hyperparameters used for tuning `Regression`, `Classification`, and `Neural Network` models as well as column grouping specific to the Airbnb data useed in this project.
+
+## /utils
+Comprises two files. `data_utils.py` includes functions used to clean, load, and split data used in the project. `model_utils.py` includes functions used to custom tune hyperparameters of different models, save the optimum models (based on a chosen metric) for each regressor / classifier and their corresponding hyperparameters and metrics and load in a model based on the optimum chosen metric.
+
+# /scripts
+This folder includes three files `regression.py` used to execute the optimization of regression code; `classification.py` used in the same manner; and `neural_network.py`.
+
 
 
