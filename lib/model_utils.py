@@ -4,7 +4,6 @@ import joblib
 import json
 import math
 import os
-import torch
 from sklearn.metrics import mean_squared_error, precision_score, recall_score, accuracy_score, f1_score
 
 from config import model_config
@@ -70,18 +69,9 @@ def choose_optimal_params(acc_metrics, config_metric):
 
 
 def save_model(trained_model, output_folder, opt_hyperparams=None, metrics=None):
-
-    # if isinstance(trained_model, NN) == True:
-    if False == True:
-        now = datetime.datetime.now()
-        output_folder = f"{output_folder}/{now}"
-        os.makedirs(output_folder)
-        filepath = f"{output_folder}/model.pt"
-        torch.save(trained_model.state_dict(), filepath)
-
-    else:
-        filepath = f"{output_folder}/model.joblib"
-        joblib.dump(trained_model, filepath)
+    
+    filepath = f"{output_folder}/model.joblib"
+    joblib.dump(trained_model, filepath)
 
     filepath = f"{output_folder}/hyperparameters.json"
     json.dump(opt_hyperparams, open(filepath, "w"))
@@ -104,7 +94,7 @@ def evaluate_all_models(
 
     for model, params in models:
 
-        acc_metrics = custom_tune_model_params(
+        metrics_all_models = custom_tune_model_params(
             model,
             X_train,
             y_train,
@@ -115,7 +105,7 @@ def evaluate_all_models(
         )
 
         optim_params = choose_optimal_params(
-            acc_metrics,
+            metrics_all_models,
             config_metric
         )
 
@@ -129,7 +119,7 @@ def evaluate_all_models(
         optim_metrics = derive_metrics(
             m, X_validation, y_validation)
 
-        model_name = f"{m}".split("(")[0]  # how to better approach this
+        model_name = f"{m}".split("(")[0]  # how to better approach this?
 
         save_model(
             m, f"{output_folder}/{model_name}/", optim_params, optim_metrics)
@@ -138,9 +128,8 @@ def evaluate_all_models(
 def find_optimal_model(models, output_folder, config_metric):
 
     metrics_summary = []
-    for model, config in models:
-        # how to better approach this?
-        model_name = f"{model}".split(".")[-1].strip("'>")
+    for model, config_ in models:
+        model_name = f"{model}".split(".")[-1].strip("'>") # how to better approach this?
         filepath = f"{output_folder}/{model_name}/metrics.json"
         with open(filepath) as json_file:
             metrics = json.load(json_file)

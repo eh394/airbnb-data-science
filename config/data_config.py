@@ -13,3 +13,5 @@ default_value_columns = [
     'bedrooms']
 
 feature_columns = rating_columns + default_value_columns
+
+feature_columns_alternative_application = ['Category', 'guests']

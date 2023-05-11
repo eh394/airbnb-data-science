@@ -8,9 +8,7 @@ from lib import data_utils, model_utils
 
 np.random.seed(2)
 
-
 epochs = 1000
-
 
 models = [
     (LogisticRegression, model_config.LogisticRegression_params),
@@ -18,7 +16,6 @@ models = [
     (RandomForestClassifier, model_config.RandomForestClassifier_params),
     (GradientBoostingClassifier, model_config.GradientBoostingClassifier_params)
 ]
-
 
 if __name__ == "__main__":
 
@@ -51,7 +48,7 @@ if __name__ == "__main__":
         config_metric="accuracy"
     )
 
-    opt_model_name, opt_metric = model_utils.find_optimal_model(
+    opt_model_name, _opt_metric = model_utils.find_optimal_model(
         models,
         output_folder="models/classification",
         config_metric="accuracy"

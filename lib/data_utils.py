@@ -31,7 +31,7 @@ def set_default_feature_values(df, subset, default):
     return df
 
 
-def clean_tabular_data(
+def clean_airbnb_data(
         df,
         missing_values_subset,
         description_string_subset,
@@ -56,7 +56,7 @@ def load_df(
         df = pd.read_csv(clean_data_filename)
     except:
         df = pd.read_csv(raw_data_filename)
-        df = clean_tabular_data(
+        df = clean_airbnb_data(
             df, missing_values_subset, description_string_subset, default_values_subset, default_value)
         df.to_csv(clean_data_filename)
 

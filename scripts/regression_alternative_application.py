@@ -10,7 +10,7 @@ np.random.seed(2)
 
 epochs = 1000
 
-odels = [
+models = [
     (SGDRegressor, model_config.SGDRegressor_params),
     (LinearRegression, model_config.LinearRegression_params),
     (DecisionTreeRegressor, model_config.DecisionTreeRegressor_params),
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     X_train, y_train, X_validation, y_validation, X_test, y_test = data_utils.load_split_X_y(
         df,
-        features=data_config.feature_columns,
+        features=data_config.feature_columns_alternative_application, # any columns can be used as features or labels with the same code
         labels="Price_Night",
         train_test_proportion=0.7,
         test_validation_proportion=0.5

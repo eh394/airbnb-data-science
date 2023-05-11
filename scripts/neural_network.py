@@ -1,6 +1,8 @@
 import datetime
 import itertools
+import json
 import numpy as np
+import os
 import torch
 import yaml
 from torcheval.metrics.functional import r2_score
@@ -8,11 +10,8 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-import data_config
-import data_utils
-import model_config
-import model_utils
-
+from config import data_config, model_config
+from lib import data_utils
 
 np.random.seed(2)
 
@@ -54,9 +53,8 @@ def train(model, data_loader, params, epochs=10):
             loss.backward()
             optimiser.step()
             optimiser.zero_grad()
-            writer.add_scalar('loss', loss.item(), batch_idx)
+            writer.add_scalar("loss", loss.item(), batch_idx)
             batch_idx += 1
-        # print(epoch, loss)
 
     return model
 
@@ -107,7 +105,6 @@ def generate_nn_configs(params):
 
 def optimize_nn_params(permutations):
     summary_params_metrics = []
-    run = 1
     for params in permutations:
         metrics = {}
         model = NN(params)
@@ -115,17 +112,30 @@ def optimize_nn_params(permutations):
         model = train(model, train_loader, params)
         metrics["training_duration"] = (
             datetime.datetime.now() - start).microseconds
-        metrics["RMSE_train"], metrics["R2_train"], latency_train = evaluate_model(
+        metrics["RMSE_train"], metrics["R2_train"], latency_train_ = evaluate_model(
             model, X_train, y_train)
         metrics["RMSE_validation"], metrics["R2_validation"], metrics["inference_latency"] = evaluate_model(
             model, X_validation, y_validation)
-        run += 1
         summary_params_metrics.append([params, metrics])
     return summary_params_metrics
 
 
+def save_model(trained_model, output_folder, opt_hyperparams=None, metrics=None):
+    now = datetime.datetime.now()
+    output_folder = f"{output_folder}/{now}"
+    os.makedirs(output_folder)
+    filepath = f"{output_folder}/model.pt"
+    torch.save(trained_model.state_dict(), filepath)
+
+    filepath = f"{output_folder}/hyperparameters.json"
+    json.dump(opt_hyperparams, open(filepath, "w"))
+
+    filepath = f"{output_folder}/metrics.json"
+    json.dump(metrics, open(filepath, "w"))
+
+
 def find_best_nn(summary):
-    RMSE_opt = 1000
+    RMSE_opt = summary[0][1]["RMSE_validation"]
     params_opt = {}
     metrics_opt = {}
     for entry in summary:
@@ -134,9 +144,8 @@ def find_best_nn(summary):
             params_opt = entry[0]
             metrics_opt = entry[1]
 
-    print(params_opt, metrics_opt)
     model = NN(params_opt)
-    model_utils.save_model(
+    save_model(
         model,
         output_folder="models/neural_networks/regression/",
         opt_hyperparams=params_opt,
@@ -149,10 +158,10 @@ def find_best_nn(summary):
 if __name__ == "__main__":
 
     df = data_utils.load_df(
-        raw_data_filename='listings.csv',
-        clean_data_filename='listings_clean.csv',
+        raw_data_filename="listings.csv",
+        clean_data_filename="listings_clean.csv",
         missing_values_subset=data_config.rating_columns,
-        description_string_subset='Description',
+        description_string_subset="Description",
         default_values_subset=data_config.default_value_columns,
         default_value=1
     )
@@ -160,7 +169,7 @@ if __name__ == "__main__":
     X_train, y_train, X_validation, y_validation, X_test, y_test = data_utils.load_split_X_y(
         df,
         features=data_config.feature_columns,
-        labels='Price_Night',
+        labels="Price_Night",
         train_test_proportion=0.7,
         test_validation_proportion=0.5
     )
@@ -175,5 +184,5 @@ if __name__ == "__main__":
     validation_loader = DataLoader(validation_dataset)
     model, params_opt, metrics_opt = find_best_nn(optimize_nn_params(
         generate_nn_configs(model_config.NN_params)))
-    
+
     print(params_opt, metrics_opt)
