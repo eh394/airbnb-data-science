@@ -12,7 +12,7 @@ Salaries.csv
 pytorch_test.py
 BostonHousing.csv
 runs
-.~lock.BostonHousing.csv
+*.csv#
 notes
 __pycache__
 
