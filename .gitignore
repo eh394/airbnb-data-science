@@ -1,18 +1,8 @@
-airbnb-property-listings
-airbnb-property-listings.zip
-test.py
-clean_tabular_data.csv
-listing.csv
-ml_notes.py
-initial_results.csv
-*.csv
-models
-temp
-Salaries.csv
-pytorch_test.py
-BostonHousing.csv
-runs
-*.csv#
 notes
+support_files
+models
+test.py
+*.csv
+*.csv#
 __pycache__
 
