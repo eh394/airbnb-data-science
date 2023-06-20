@@ -17,7 +17,6 @@ np.random.seed(2)
 
 
 class AirbnbNightlyPriceRegressionDataset(Dataset):
-
     def __init__(self, data):
         super().__init__()
         X, y = data
@@ -38,13 +37,11 @@ def get_nn_config(filename):
 
 
 def train(model, data_loader, params, epochs=10):
-
     optimiser = getattr(torch.optim, params["optimiser"])
     optimiser = optimiser(model.parameters(), lr=params["lr"])
     loss_fn = F.mse_loss
     writer = SummaryWriter()
     batch_idx = 0
-
     for epoch in range(epochs):
         for batch in data_loader:
             X, y = batch
@@ -55,16 +52,13 @@ def train(model, data_loader, params, epochs=10):
             optimiser.zero_grad()
             writer.add_scalar("loss", loss.item(), batch_idx)
             batch_idx += 1
-
     return model
 
 
 class NN(torch.nn.Module):
     def __init__(self, hyperparams):
         super().__init__()
-
         n = hyperparams["model_depth"] - 2
-
         layers = [torch.nn.Linear(
             10, hyperparams["hidden_layer_width"]), torch.nn.ReLU()]
         for i in range(n):
@@ -72,7 +66,6 @@ class NN(torch.nn.Module):
                 hyperparams["hidden_layer_width"], hyperparams["hidden_layer_width"]))
             layers.append(torch.nn.ReLU())
         layers.append(torch.nn.Linear(hyperparams["hidden_layer_width"], 1))
-
         self.model = torch.nn.Sequential(*layers)
 
     def forward(self, X):
@@ -80,7 +73,6 @@ class NN(torch.nn.Module):
 
 
 def evaluate_model(model, X, y):
-
     model.eval()
     X = torch.tensor(X.values, dtype=torch.float32)
     y = torch.tensor(y.values, dtype=torch.float32).unsqueeze(-1)
@@ -126,10 +118,8 @@ def save_model(trained_model, output_folder, opt_hyperparams=None, metrics=None)
     os.makedirs(output_folder)
     filepath = f"{output_folder}/model.pt"
     torch.save(trained_model.state_dict(), filepath)
-
     filepath = f"{output_folder}/hyperparameters.json"
     json.dump(opt_hyperparams, open(filepath, "w"))
-
     filepath = f"{output_folder}/metrics.json"
     json.dump(metrics, open(filepath, "w"))
 
@@ -143,7 +133,6 @@ def find_best_nn(summary):
             RMSE_opt = entry[1]["RMSE_validation"]
             params_opt = entry[0]
             metrics_opt = entry[1]
-
     model = NN(params_opt)
     save_model(
         model,
@@ -151,7 +140,6 @@ def find_best_nn(summary):
         opt_hyperparams=params_opt,
         metrics=metrics_opt
     )
-
     return model, params_opt, metrics_opt
 
 

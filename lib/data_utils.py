@@ -59,7 +59,6 @@ def load_df(
         df = clean_airbnb_data(
             df, missing_values_subset, description_string_subset, default_values_subset, default_value)
         df.to_csv(clean_data_filename)
-
     return df
 
 
@@ -70,13 +69,10 @@ def load_split_X_y(
         train_test_proportion=0.7,
         test_validation_proportion=0.5
 ):
-
     X = df[features]
     y = df[labels]
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, train_size=train_test_proportion)
     X_validation, X_test, y_validation, y_test = train_test_split(
         X_test, y_test, test_size=test_validation_proportion)
-
     return X_train, y_train, X_validation, y_validation, X_test, y_test

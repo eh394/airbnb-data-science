@@ -10,7 +10,7 @@ np.random.seed(2)
 
 epochs = 1000
 
-odels = [
+models = [
     (SGDRegressor, model_config.SGDRegressor_params),
     (LinearRegression, model_config.LinearRegression_params),
     (DecisionTreeRegressor, model_config.DecisionTreeRegressor_params),
@@ -49,15 +49,15 @@ if __name__ == "__main__":
         config_metric="RMSE"
     )
 
-    opt_model_name, opt_metric = model_utils.find_optimal_model(
-        models,
-        output_folder="models/regression",
-        config_metric="RMSE"
-    )
+    # opt_model_name, opt_metric = model_utils.find_optimal_model(
+    #     models,
+    #     output_folder="models/regression",
+    #     config_metric="RMSE"
+    # )
 
-    opt_model, opt_params, opt_metrics = model_utils.load_model(
-        opt_model_name,
-        folder="models/regression"
-    )
+    # opt_model, opt_params, opt_metrics = model_utils.load_model(
+    #     opt_model_name,
+    #     folder="models/regression"
+    # )
 
-    print(opt_model, opt_params, opt_metrics)
+    # print(opt_model, opt_params, opt_metrics)
