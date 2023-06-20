@@ -49,15 +49,15 @@ if __name__ == "__main__":
         config_metric="RMSE"
     )
 
-    # opt_model_name, opt_metric = model_utils.find_optimal_model(
-    #     models,
-    #     output_folder="models/regression",
-    #     config_metric="RMSE"
-    # )
+    opt_model_name, opt_metric = model_utils.find_optimal_model(
+        models,
+        output_folder="models/regression",
+        config_metric="RMSE"
+    )
 
-    # opt_model, opt_params, opt_metrics = model_utils.load_model(
-    #     opt_model_name,
-    #     folder="models/regression"
-    # )
+    opt_model, opt_params, opt_metrics = model_utils.load_model(
+        opt_model_name,
+        folder="models/regression"
+    )
 
-    # print(opt_model, opt_params, opt_metrics)
+    print(opt_model, opt_params, opt_metrics)
